@@ -1,6 +1,7 @@
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, session
 from urllib.parse import quote, unquote
+import unicodedata
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -61,6 +62,10 @@ categorias = [
     'Verduras', 'Outros'
 ]
 
+def normalize_name(name):
+    name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
+    return name.replace(' ', '_').lower()
+
 def get_cart():
     """Helper function to get the cart as a dictionary"""
     carrinho = session.get('carrinho', {})
@@ -75,13 +80,13 @@ def index():
     produtos_filtrados = [p for p in produtos if p['Tipo'] == categoria_selecionada]
     carrinho = get_cart()
     carrinho_count = sum(item['quantidade'] for item in carrinho.values())
-    return render_template('index.html', categorias=categorias, produtos=produtos_filtrados, categoria_selecionada=categoria_selecionada, carrinho_count=carrinho_count, quote=quote)
+    return render_template('index.html', categorias=categorias, produtos=produtos_filtrados, categoria_selecionada=categoria_selecionada, carrinho_count=carrinho_count, quote=quote, normalize_name=normalize_name)
 
 @app.route('/add_to_cart/<produto_nome>')
 def add_to_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
-    produto_nome = unquote(produto_nome)
-    produto = next((p for p in produtos if p["Produto"] == produto_nome), None)
+    produto_nome = normalize_name(unquote(produto_nome))
+    produto = next((p for p in produtos if normalize_name(p["Produto"]) == produto_nome), None)
     if produto:
         carrinho = get_cart()
         
@@ -111,7 +116,7 @@ def cart():
 def remove_from_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
     carrinho = get_cart()
-    produto_nome = unquote(produto_nome)
+    produto_nome = normalize_name(unquote(produto_nome))
     if produto_nome in carrinho:
         if carrinho[produto_nome]['quantidade'] > 1:
             carrinho[produto_nome]['quantidade'] -= 1

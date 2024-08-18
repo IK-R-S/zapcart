@@ -51,12 +51,19 @@
             background-color: #1ebe58;
         }
     </style>
+    <script>
+        function finalizarCompra() {
+            const url = window.location.href;
+            const whatsappLink = `https://api.whatsapp.com/send/?phone=553588491777&text=Ol%C3%A1,%20fiz%20meu%20pedido:%20${encodeURIComponent(url)}`;
+            window.open(whatsappLink, '_blank');
+        }
+    </script>
 </head>
 <body>
     <div class="pedido-container">
         <h1>Resumo do Pedido</h1>
         <pre>{{ pedido }}</pre>
-        <a href="https://api.whatsapp.com/send/?phone=553588491777&text=Ol%C3%A1,%20fiz%20meu%20pedido:%20https://zapcart.vercel.app/pedidos/{{ carrinho_id }}" class="finalizar-button">FINALIZAR COMPRA</a>
+        <button class="finalizar-button" onclick="finalizarCompra()">FINALIZAR COMPRA</button>
     </div>
 </body>
 </html>

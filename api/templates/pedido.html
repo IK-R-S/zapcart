@@ -18,6 +18,7 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h1 {
@@ -29,6 +30,25 @@
         pre {
             font-size: 16px;
             color: #555;
+            text-align: left;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .finalizar-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .finalizar-button:hover {
+            background-color: #1ebe58;
         }
     </style>
 </head>
@@ -36,6 +56,7 @@
     <div class="pedido-container">
         <h1>Resumo do Pedido</h1>
         <pre>{{ pedido }}</pre>
+        <a href="https://api.whatsapp.com/send/?phone=553588491777&text=Ol%C3%A1,%20fiz%20meu%20pedido:%20https://zapcart.vercel.app/pedidos/{{ carrinho_id }}" class="finalizar-button">FINALIZAR COMPRA</a>
     </div>
 </body>
 </html>

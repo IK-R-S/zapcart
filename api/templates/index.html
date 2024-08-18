@@ -246,6 +246,23 @@
                 hamburger.classList.add('active');
             }
         }
+
+        console.log("Page loaded"); // Para ver quando a página carrega
+
+        // Função para verificar o click e os parâmetros enviados para adicionar ao carrinho
+        function addToCart(produtoNome, categoria) {
+            console.log("Adding to cart:", produtoNome, categoria);
+            window.location.href = `/add_to_cart/${produtoNome}?categoria=${categoria}`;
+        }
+
+        document.querySelectorAll('.add-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const produtoNome = button.closest('.produto-item').querySelector('h3').innerText;
+                const categoria = "{{ categoria_selecionada }}";
+                addToCart(produtoNome, categoria);
+            });
+        });
     </script>
 </body>
 </html>

@@ -224,7 +224,7 @@
                     <p><strong>Preço:</strong> R$ {{ produto.Preço }}</p>
                     <p><strong>Localização:</strong> {{ produto.Localização }}</p>
                 </div>
-                <a href="{{ url_for('add_to_cart', produto_nome=quote(produto.Produto), categoria=categoria_selecionada) }}" class="add-button">+ Lista</a>
+                <a href="{{ url_for('add_to_cart', produto_nome=quote(normalize_name(produto.Produto)), categoria=categoria_selecionada) }}" class="add-button">+ Lista</a>
             </div>
             {% endfor %}
         </div>

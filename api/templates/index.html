@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Produtos</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .content {
+            display: flex;
+            flex-grow: 1;
+            position: relative;
+            height: calc(100vh - 60px); /* Ajuste da altura do conteúdo */
+            overflow-y: auto;
+            padding-bottom: 80px; /* Adiciona espaço extra na parte inferior */
+        }
+
+        .categorias {
+            width: 220px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px 10px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .categorias h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .categorias ul {
+            list-style: none;
+        }
+
+        .categoria-item {
+            margin-bottom: 10px;
+        }
+
+        .categoria-item a {
+            text-decoration: none;
+            color: #333;
+            padding: 10px;
+            display: block;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .categoria-item a.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .categoria-item a:hover {
+            background-color: #e9ecef;
+        }
+
+        .produtos {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .produto-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .produto-item h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .produto-item p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .add-button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+
+        .cart-button {
+            padding: 15px;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 0px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .cart-button span {
+            background-color: white;
+            color: #343a40;
+            border-radius: 50%;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+
+        .cart-button:hover {
+            background-color: #495057;
+        }
+
+        /* Menu hambúrguer */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            padding: 15px;
+            background-color: #343a40;
+            color: white;
+            font-size: 18px;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .hamburger.active + .categorias {
+            transform: translateX(0);
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .categorias {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 220px;
+                transform: translateX(-100%);
+                z-index: 10;
+                background-color: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .produtos {
+                padding: 10px;
+            }
+
+            .produto-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .add-button {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .cart-button {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="hamburger" onclick="toggleMenu()">☰ Categorias</button>
+    <div class="content">
+        <div class="categorias">
+            <h2>Categorias</h2>
+            <ul>
+                {% for categoria in categorias %}
+                <li class="categoria-item">
+                    <a href="/?categoria={{ categoria }}" class="{% if categoria == categoria_selecionada %}active{% endif %}">
+                        {{ categoria }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="produtos">
+            {% for produto in produtos %}
+            <div class="produto-item">
+                <div>
+                    <h3>{{ produto.Produto }}</h3>
+                    <p><strong>Marca:</strong> {{ produto.Marca }}</p>
+                    <p><strong>Preço:</strong> R$ {{ produto.Preço }}</p>
+                    <p><strong>Localização:</strong> {{ produto.Localização }}</p>
+                </div>
+                <a href="{{ url_for('add_to_cart', produto_nome=produto.Produto, categoria=categoria_selecionada) }}" class="add-button">+ Lista</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <a href="{{ url_for('cart') }}" class="cart-button">
+        Visualizar sua lista
+        <span>{{ carrinho_count }}</span>
+    </a>
+
+    <script>
+        function toggleMenu() {
+            const categorias = document.querySelector('.categorias');
+            const hamburger = document.querySelector('.hamburger');
+            if (categorias.style.transform === 'translateX(0px)') {
+                categorias.style.transform = 'translateX(-100%)';
+                hamburger.classList.remove('active');
+            } else {
+                categorias.style.transform = 'translateX(0px)';
+                hamburger.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Lista</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .cart-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cart-item h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .cart-item p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .remove-button {
+            padding: 8px 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .remove-button:hover {
+            background-color: #c82333;
+        }
+
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .back-button,
+        .print-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .print-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .print-button:hover {
+            background-color: #218838;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .remove-button {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .total {
+                text-align: center;
+            }
+
+            .back-button,
+            .print-button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Sua Lista</h2>
+    {% for item in carrinho.values() %}
+    <div class="cart-item">
+        <div>
+            <h3>{{ item.produto.Produto }} (x{{ item.quantidade }})</h3>
+            <p><strong>Marca:</strong> {{ item.produto.Marca }}</p>
+            <p><strong>Localização:</strong> {{ item.produto.Localização }}</p>
+            <p><strong>Preço Unitário:</strong> R$ {{ item.produto.Preço }}</p>
+            <p><strong>Subtotal:</strong> R$ {{ item.subtotal }}</p>
+        </div>
+        <a href="{{ url_for('remove_from_cart', produto_nome=item.produto.Produto) }}" class="remove-button">X Remover</a>
+    </div>
+    {% endfor %}
+    <div class="total">Total: R$ {{ total }}</div>
+    <a href="{{ url_for('index') }}" class="back-button">Voltar</a>
+
+    <!-- Formulário para imprimir a lista -->
+    <form action="{{ url_for('imprimir_lista') }}" method="post" style="display:inline;">
+        <button type="submit" class="print-button">Imprimir Lista</button>
+    </form>
+</body>
+</html>

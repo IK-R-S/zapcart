@@ -224,7 +224,7 @@
                     <p><strong>Preço:</strong> R$ {{ produto.Preço }}</p>
                     <p><strong>Localização:</strong> {{ produto.Localização }}</p>
                 </div>
-                <a href="{{ url_for('add_to_cart', produto_nome=produto.Produto, categoria=categoria_selecionada) }}" class="add-button">+ Lista</a>
+                <a href="{{ url_for('add_to_cart', produto_nome=quote(produto.Produto), categoria=categoria_selecionada) }}" class="add-button">+ Lista</a>
             </div>
             {% endfor %}
         </div>
@@ -246,23 +246,6 @@
                 hamburger.classList.add('active');
             }
         }
-
-        console.log("Page loaded"); // Para ver quando a página carrega
-
-        // Função para verificar o click e os parâmetros enviados para adicionar ao carrinho
-        function addToCart(produtoNome, categoria) {
-            console.log("Adding to cart:", produtoNome, categoria);
-            window.location.href = `/add_to_cart/${produtoNome}?categoria=${categoria}`;
-        }
-
-        document.querySelectorAll('.add-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const produtoNome = button.closest('.produto-item').querySelector('h3').innerText;
-                const categoria = "{{ categoria_selecionada }}";
-                addToCart(produtoNome, categoria);
-            });
-        });
     </script>
 </body>
 </html>

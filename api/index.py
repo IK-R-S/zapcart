@@ -75,7 +75,7 @@ def index():
     produtos_filtrados = [p for p in produtos if p['Tipo'] == categoria_selecionada]
     carrinho = get_cart()
     carrinho_count = sum(item['quantidade'] for item in carrinho.values())
-    return render_template('index.html', categorias=categorias, produtos=produtos_filtrados, categoria_selecionada=categoria_selecionada, carrinho_count=carrinho_count)
+    return render_template('index.html', categorias=categorias, produtos=produtos_filtrados, categoria_selecionada=categoria_selecionada, carrinho_count=carrinho_count, quote=quote)
 
 @app.route('/add_to_cart/<produto_nome>')
 def add_to_cart(produto_nome):

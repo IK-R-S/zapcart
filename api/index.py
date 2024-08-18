@@ -1,20 +1,29 @@
-import sqlite3
+import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Conexão e criação da tabela no SQLite
+# Configurações de conexão com o banco de dados Postgres
+DB_CONFIG = {
+    'dbname': 'zapcart',
+    'user': 'IK-R-S',
+    'password': 'E5zjlaZiSK3Q',
+    'host': 'ep-calm-wildflower-96501958.eu-central-1.aws.neon.tech'
+}
+
+# Conexão e criação da tabela no Postgres
 def init_db():
-    conn = sqlite3.connect('carrinhos.db')
+    conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS carrinhos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             pedido TEXT NOT NULL
         )
     ''')
     conn.commit()
+    cursor.close()
     conn.close()
 
 # Inicializa o banco de dados
@@ -116,24 +125,29 @@ def imprimir_lista():
     lista += f"TOTAL: R$ {total}"
     
     # Salva no banco de dados
-    conn = sqlite3.connect('carrinhos.db')
+    conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO carrinhos (pedido) VALUES (?)", (lista,))
+    cursor.execute('INSERT INTO carrinhos (pedido) VALUES (%s) RETURNING id', (lista,))
+    carrinho_id = cursor.fetchone()[0]
     conn.commit()
-    pedido_id = cursor.lastrowid  # Obtém o ID do registro inserido
+    cursor.close()
     conn.close()
+    
+    # Limpa o carrinho
+    session['carrinho'] = {}
+    
+    return redirect(url_for('pedido', carrinho_id=carrinho_id))
 
-    return redirect(url_for('ver_pedido', id=pedido_id))
-
-@app.route('/pedidos/<int:id>')
-def ver_pedido(id):
-    conn = sqlite3.connect('carrinhos.db')
+@app.route('/pedidos/<int:carrinho_id>')
+def pedido(carrinho_id):
+    conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute("SELECT pedido FROM carrinhos WHERE id = ?", (id,))
+    cursor.execute('SELECT pedido FROM carrinhos WHERE id = %s', (carrinho_id,))
     pedido = cursor.fetchone()
+    cursor.close()
     conn.close()
     
     if pedido:
-        return f"<pre>{pedido[0]}</pre>"
+        return render_template('pedido.html', pedido=pedido[0])
     else:
         return "Pedido não encontrado", 404

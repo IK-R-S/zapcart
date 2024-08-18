@@ -80,8 +80,15 @@ def index():
 def add_to_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
     produto = next((p for p in produtos if p["Produto"] == produto_nome), None)
+    
+    # Adicionando log para depuração
+    print(f"Produto selecionado: {produto_nome}")
+    print(f"Produto encontrado: {produto}")
+
     if produto:
         carrinho = get_cart()
+        print(f"Carrinho antes da adição: {carrinho}")
+        
         if produto_nome in carrinho:
             carrinho[produto_nome]['quantidade'] += 1
             carrinho[produto_nome]['subtotal'] = carrinho[produto_nome]['quantidade'] * produto['Preço']
@@ -91,7 +98,10 @@ def add_to_cart(produto_nome):
                 'quantidade': 1,
                 'subtotal': produto['Preço']
             }
+        
         session['carrinho'] = carrinho
+        print(f"Carrinho depois da adição: {carrinho}")
+    
     return redirect(url_for('index', categoria=categoria))
 
 @app.route('/cart')
@@ -104,13 +114,19 @@ def cart():
 def remove_from_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
     carrinho = get_cart()
+    
+    print(f"Removendo produto: {produto_nome}")
+    
     if produto_nome in carrinho:
         if carrinho[produto_nome]['quantidade'] > 1:
             carrinho[produto_nome]['quantidade'] -= 1
             carrinho[produto_nome]['subtotal'] = carrinho[produto_nome]['quantidade'] * carrinho[produto_nome]['produto']['Preço']
         else:
             del carrinho[produto_nome]
+        
         session['carrinho'] = carrinho
+        print(f"Carrinho depois da remoção: {carrinho}")
+    
     return redirect(url_for('cart', categoria=categoria))
 
 @app.route('/imprimir_lista', methods=['POST'])

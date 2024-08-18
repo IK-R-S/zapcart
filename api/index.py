@@ -1,5 +1,6 @@
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, session
+from urllib.parse import quote, unquote
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -79,11 +80,12 @@ def index():
 @app.route('/add_to_cart/<produto_nome>')
 def add_to_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
+    produto_nome = unquote(produto_nome)
     produto = next((p for p in produtos if p["Produto"] == produto_nome), None)
     if produto:
         carrinho = get_cart()
         
-        # Corrigindo a chave para o nome do produto
+        # Utiliza o nome do produto como chave única
         produto_id = produto_nome
         
         if produto_id in carrinho:
@@ -99,7 +101,6 @@ def add_to_cart(produto_nome):
     
     return redirect(url_for('index', categoria=categoria))
 
-
 @app.route('/cart')
 def cart():
     carrinho = get_cart()
@@ -110,19 +111,14 @@ def cart():
 def remove_from_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
     carrinho = get_cart()
-    
-    print(f"Removendo produto: {produto_nome}")
-    
+    produto_nome = unquote(produto_nome)
     if produto_nome in carrinho:
         if carrinho[produto_nome]['quantidade'] > 1:
             carrinho[produto_nome]['quantidade'] -= 1
             carrinho[produto_nome]['subtotal'] = carrinho[produto_nome]['quantidade'] * carrinho[produto_nome]['produto']['Preço']
         else:
             del carrinho[produto_nome]
-        
         session['carrinho'] = carrinho
-        print(f"Carrinho depois da remoção: {carrinho}")
-    
     return redirect(url_for('cart', categoria=categoria))
 
 @app.route('/imprimir_lista', methods=['POST'])

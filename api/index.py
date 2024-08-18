@@ -80,29 +80,25 @@ def index():
 def add_to_cart(produto_nome):
     categoria = request.args.get('categoria', 'Não perecíveis')
     produto = next((p for p in produtos if p["Produto"] == produto_nome), None)
-    
-    # Adicionando log para depuração
-    print(f"Produto selecionado: {produto_nome}")
-    print(f"Produto encontrado: {produto}")
-
     if produto:
         carrinho = get_cart()
-        print(f"Carrinho antes da adição: {carrinho}")
         
-        if produto_nome in carrinho:
-            carrinho[produto_nome]['quantidade'] += 1
-            carrinho[produto_nome]['subtotal'] = carrinho[produto_nome]['quantidade'] * produto['Preço']
+        # Corrigindo a chave para o nome do produto
+        produto_id = produto_nome
+        
+        if produto_id in carrinho:
+            carrinho[produto_id]['quantidade'] += 1
+            carrinho[produto_id]['subtotal'] = carrinho[produto_id]['quantidade'] * produto['Preço']
         else:
-            carrinho[produto_nome] = {
+            carrinho[produto_id] = {
                 'produto': produto,
                 'quantidade': 1,
                 'subtotal': produto['Preço']
             }
-        
         session['carrinho'] = carrinho
-        print(f"Carrinho depois da adição: {carrinho}")
     
     return redirect(url_for('index', categoria=categoria))
+
 
 @app.route('/cart')
 def cart():
